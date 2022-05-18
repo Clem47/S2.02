@@ -4,9 +4,10 @@ import io.jbotsim.core.Node;
 import io.jbotsim.core.Topology;
 import io.jbotsim.core.event.SelectionListener;
 import io.jbotsim.ui.JTopology;
+import io.jbotsim.ui.icons.Icons;
 
 import javax.swing.*;
-import javax.xml.transform.Source;
+//import javax.xml.transform.Source;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
@@ -15,7 +16,8 @@ import java.awt.event.ActionListener;
 public class MonApplication implements ActionListener , SelectionListener {
     Topology tp; // Objet qui contient le graphe
     JTopology jtp; // Composant graphique qui affiche le graphe
-    Node source , destination = new Node();
+    Node source;
+    Node destination;
 
     public MonApplication() {
         // Création du graphe
@@ -35,15 +37,11 @@ public class MonApplication implements ActionListener , SelectionListener {
         window.add(jtp);
 
         // Création d'un bouton test
-        JButton topButton = new JButton("Top");
+        JButton topButton = new JButton("Reset");
         window.add(topButton,BorderLayout.NORTH);
-
-        JButton downButton = new JButton("Down");
-        window.add(downButton,BorderLayout.SOUTH);
 
         // Abonnement aux évènements du bouton (clic, etc.)
         topButton.addActionListener(this);
-        downButton.addActionListener(this);
 
         //
         tp.addSelectionListener(this);
@@ -55,24 +53,25 @@ public class MonApplication implements ActionListener , SelectionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (e.getActionCommand().equals("Top")) {
-            JOptionPane.showMessageDialog(null, "Bouton haut cliqué");
-        }
-        if (e.getActionCommand().equals("Down")) {
-            JOptionPane.showMessageDialog(null, "Bouton bas cliqué");
+        if (e.getActionCommand().equals("Reset")) {
+          destination.setIcon(null);
+          destination = null;
+          source.setColor(Node.DEFAULT_COLOR);
+          source = null;
         }
     }
 
     @Override
     public void onSelection(Node selectedNode) {
-        if(destination == null && source!=null ){
-            destination = selectedNode;
-            System.out.println("Destination");
-        }
         if(source == null){
             source = selectedNode;
             source.setColor(Color.black);
-            System.out.println("Source");
+            return;
+        }
+        if(destination == null ){
+            destination = selectedNode;
+            destination.setIcon(Icons.FLAG);
+            return;
         }
     }
 
