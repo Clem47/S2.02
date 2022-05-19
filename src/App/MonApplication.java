@@ -5,6 +5,8 @@ import io.jbotsim.core.Topology;
 import io.jbotsim.core.event.SelectionListener;
 import io.jbotsim.ui.JTopology;
 import io.jbotsim.ui.icons.Icons;
+import io.jbotsim.core.Link;
+
 
 import javax.swing.*;
 //import javax.xml.transform.Source;
@@ -12,6 +14,7 @@ import javax.swing.*;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -67,13 +70,11 @@ public class MonApplication implements ActionListener , SelectionListener {
           resetPath();
         }
         if (e.getActionCommand().equals("BFS")) {
-            parents = ParcoursEnLargeur(tp,source);
             resetPath();
-            for (Node n  : parents.keySet() ) {
-                if(!n.equals(parents.get(n))){
-                    n.getCommonLinkWith(parents.get(n)).setWidth(4);
-                    
-                }
+            parents = ParcoursEnLargeur(tp,source);
+            ArrayList<Node> goodPath = extraireChemin(parents);
+            for(int i = 0  ; i<goodPath.size()-1 ; i++ ){
+                goodPath.get(i).getCommonLinkWith(goodPath.get(i+1)).setWidth(4);
             }
         }
     }
@@ -117,19 +118,22 @@ public class MonApplication implements ActionListener , SelectionListener {
         return parent;
     }
 
-    private void resetPath(){
-        if(parents != null){
-            for (Node n  : parents.keySet() ) {
-                if(!n.equals(parents.get(n))){
-                    n.getCommonLinkWith(parents.get(n)).setWidth(1);
-                }
-            }
+    public ArrayList<Node> extraireChemin(HashMap<Node,Node> graph){
+        ArrayList<Node> goodPath = new ArrayList<>();
+        goodPath.add(destination);
+        while(!graph.get(goodPath.get(0)).equals(goodPath.get(0))){
+            goodPath.add(0,graph.get(goodPath.get(0)));
         }
+        return goodPath;
+    }
+
+    private void resetPath(){
+            for (Link l : tp.getLinks()) {
+                l.setWidth(1);
+            }
     }
     
     public static void main(String[] args) {
         new MonApplication();
     }
-
-
 }
