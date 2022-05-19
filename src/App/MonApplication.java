@@ -12,12 +12,16 @@ import javax.swing.*;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Queue;
 
 public class MonApplication implements ActionListener , SelectionListener {
     Topology tp; // Objet qui contient le graphe
     JTopology jtp; // Composant graphique qui affiche le graphe
     Node source;
     Node destination;
+    HashMap<Node,Node> parents;
 
     public MonApplication() {
         // Création du graphe
@@ -38,12 +42,14 @@ public class MonApplication implements ActionListener , SelectionListener {
 
         // Création d'un bouton test
         JButton topButton = new JButton("Reset");
+        JButton BFS = new JButton("BFS");
+
         window.add(topButton,BorderLayout.NORTH);
+        window.add(BFS,BorderLayout.SOUTH);
 
-        // Abonnement aux évènements du bouton (clic, etc.)
+        // Abonnement aux évènements
         topButton.addActionListener(this);
-
-        //
+        BFS.addActionListener(this);
         tp.addSelectionListener(this);
 
         // Finalisation
@@ -58,6 +64,15 @@ public class MonApplication implements ActionListener , SelectionListener {
           destination = null;
           source.setColor(Node.DEFAULT_COLOR);
           source = null;
+          resetPath();
+        }
+        if (e.getActionCommand().equals("BFS")) {
+            parents = ParcoursEnLargeur(tp,source);
+            for (Node n  : parents.keySet() ) {
+                if(!n.equals(parents.get(n))){
+                    n.getCommonLinkWith(parents.get(n)).setWidth(4);
+                }
+            }
         }
     }
 
@@ -75,7 +90,44 @@ public class MonApplication implements ActionListener , SelectionListener {
         }
     }
 
+    public HashMap<Node,Node> ParcoursEnLargeur(Topology graph, Node startNode){
+        HashMap<Node,Node> parent = new HashMap<>();
+        parent = initMap(graph,parent,startNode);
+        Queue <Node> queue = new LinkedList<>(); 
+        queue.add(startNode);
+        while (!queue.isEmpty()){
+            Node tmp = queue.poll();
+            for (Node neighbor : tmp.getNeighbors()) {
+                if(parent.get(neighbor)== null){
+                    parent.put(neighbor,tmp);
+                    if(!queue.contains(neighbor)){ queue.add(neighbor);}
+                }
+            }
+        }
+        return parent;
+    }
+
+    private HashMap<Node,Node> initMap(Topology graph,HashMap<Node,Node> parent,Node startNode){
+        for (Node n : graph.getNodes()) {
+            if (n.equals(startNode)){ parent.put(n, n);}
+            else{ parent.put(n, null);}
+        }
+        return parent;
+    }
+
+    private void resetPath(){
+        if(parents != null){
+            for (Node n  : parents.keySet() ) {
+                if(!n.equals(parents.get(n))){
+                    n.getCommonLinkWith(parents.get(n)).setWidth(1);
+                }
+            }
+        }
+    }
+    
     public static void main(String[] args) {
         new MonApplication();
     }
+
+
 }
