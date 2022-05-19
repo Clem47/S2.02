@@ -68,9 +68,11 @@ public class MonApplication implements ActionListener , SelectionListener {
         }
         if (e.getActionCommand().equals("BFS")) {
             parents = ParcoursEnLargeur(tp,source);
+            resetPath();
             for (Node n  : parents.keySet() ) {
                 if(!n.equals(parents.get(n))){
                     n.getCommonLinkWith(parents.get(n)).setWidth(4);
+                    
                 }
             }
         }
