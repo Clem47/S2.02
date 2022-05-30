@@ -1,0 +1,6 @@
+{
+    "java.project.referencedLibraries": [
+        "lib/**/*.jar",
+        "jbotsim-standalone-1.2.0.jar"
+    ]
+}
