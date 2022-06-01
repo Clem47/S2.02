@@ -15,14 +15,11 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.PriorityQueue;
-import java.util.Queue;
 
-public class MonApplication implements ActionListener , SelectionListener, Comparator<Node> {
+
+public class MonApplication implements ActionListener , SelectionListener {
     Topology tp; // Objet qui contient le graphe
     JTopology jtp; // Composant graphique qui affiche le graphe
     Node source;
@@ -69,6 +66,7 @@ public class MonApplication implements ActionListener , SelectionListener, Compa
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        SearchAlgorithm algo = new SearchAlgorithm(source,destination);
         if (e.getActionCommand().equals("Reset")) {
           destination.setIcon(null);
           destination = null;
@@ -90,7 +88,7 @@ public class MonApplication implements ActionListener , SelectionListener, Compa
 
                 if(pathOption.equals("1")){
                     resetPath();
-                    parents = ParcoursEnLargeur(tp,source);
+                    parents = algo.ParcoursEnLargeur(tp,source,forbiddenNodes);
                     for (Node n : parents.keySet()) {
                         if(!n.equals(parents.get(n))){
                         n.getCommonLinkWith(parents.get(n)).setWidth(4);
@@ -99,7 +97,7 @@ public class MonApplication implements ActionListener , SelectionListener, Compa
                 }
                 if(pathOption.equals("2")){
                     resetPath();
-                    parents = ParcoursEnLargeur(tp,source);
+                    parents = algo.ParcoursEnLargeur(tp,source,forbiddenNodes);
                     ArrayList<Node> goodPath = extraireChemin(parents);
                     for(int i = 0  ; i<goodPath.size()-1 ; i++ ){
                         goodPath.get(i).getCommonLinkWith(goodPath.get(i+1)).setWidth(4);
@@ -113,7 +111,7 @@ public class MonApplication implements ActionListener , SelectionListener, Compa
                 while(pathOption !=null && !pathOption.equals("2") && !pathOption.equals("1"));
                 if(pathOption.equals("1")){
                     resetPath();
-                    parents = AStar(tp,source);
+                    parents = algo.AStar(tp,source,forbiddenNodes);
                     for (Node n : parents.keySet()) {
                         if(!n.equals(parents.get(n)) && parents.get(n)!=null){
                         n.getCommonLinkWith(parents.get(n)).setWidth(4);
@@ -122,7 +120,7 @@ public class MonApplication implements ActionListener , SelectionListener, Compa
                 }
                 if(pathOption.equals("2")){
                     resetPath();
-                    parents = AStar(tp,source);
+                    parents =algo.AStar(tp,source,forbiddenNodes);
                     ArrayList<Node> goodPath = extraireChemin(parents);
                     for(int i = 0  ; i<goodPath.size()-1 ; i++ ){
                         goodPath.get(i).getCommonLinkWith(goodPath.get(i+1)).setWidth(4);
@@ -156,57 +154,6 @@ public class MonApplication implements ActionListener , SelectionListener, Compa
             forbiddenNodes.add(selectedNode);
             selectedNode.setColor(Color.red);
         }
-    }
-
-    public HashMap<Node,Node> ParcoursEnLargeur(Topology graph, Node startNode){
-        HashMap<Node,Node> parent = new HashMap<>();
-        parent = initMap(graph,parent,startNode);
-        Queue <Node> queue = new LinkedList<>(); 
-        queue.add(startNode);
-        while (!queue.isEmpty()){
-            Node tmp = queue.poll();
-            for (Node neighbor : tmp.getNeighbors()) {
-                if(!forbiddenNodes.contains(neighbor)){
-                    if(parent.get(neighbor)== null ){
-                        parent.put(neighbor,tmp);
-                        if(!queue.contains(neighbor)){ queue.add(neighbor);}
-                    }
-                }
-            }
-        }
-        return parent;
-    }
-
-    public HashMap<Node,Node> AStar(Topology graph, Node startNode){
-        HashMap<Node,Node> parent = new HashMap<>();
-        parent = initMap(graph,parent,startNode);
-        PriorityQueue<Node> queue = new PriorityQueue<>(this);
-        queue.add(startNode);
-        while (!queue.isEmpty()){
-            Node tmp = queue.poll();
-            for (Node neighbor : tmp.getNeighbors()) {
-                if(!forbiddenNodes.contains(neighbor)){
-                    if(parent.get(neighbor)== null ){
-                        parent.put(neighbor,tmp);
-                        if(!queue.contains(neighbor)){ queue.add(neighbor);}
-                        if (tmp.equals(destination)){
-                            return parent;
-                        }
-                    }
-                }
-            }
-        }
-        return parent;
-    }
-
-    private HashMap<Node,Node> initMap(Topology graph,HashMap<Node,Node> parent,Node startNode){
-        for (Node n : graph.getNodes()) {
-            if(!forbiddenNodes.contains(n)){
-                if (n.equals(startNode)){ parent.put(n, n);}
-                else{ parent.put(n, null);}
-            }
-        }
-        return parent;
     }
 
     public static void genererGrille(Topology tp, int nbRows){
@@ -247,11 +194,6 @@ public class MonApplication implements ActionListener , SelectionListener, Compa
         }
     }
 
-    @Override
-    public int compare(Node n1, Node n2) {
-        return (int)n1.distance(destination) - (int)n2.distance(destination);
-    }
-    
     public static void main(String[] args) {
         new MonApplication();
     }
