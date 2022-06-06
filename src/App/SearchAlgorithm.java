@@ -1,5 +1,4 @@
 package App;
-
 import io.jbotsim.core.Topology;
 import io.jbotsim.core.Node;
 
