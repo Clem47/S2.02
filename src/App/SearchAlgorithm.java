@@ -1,4 +1,4 @@
-package App;
+
 import io.jbotsim.core.Topology;
 import io.jbotsim.core.Node;
 
@@ -17,6 +17,13 @@ public class SearchAlgorithm  {
         this.destination = destination;
     }
 
+    /**
+     * BFS algorithme
+     * @param graph  Topology
+     * @param startNode Node de départ
+     * @param forbiddenNodes Liste des noeuds interdits
+     * @return HashMap<Node,Node> parent
+     */
     public HashMap<Node,Node> ParcoursEnLargeur(Topology graph, Node startNode, HashSet<Node> forbiddenNodes) {
         HashMap<Node,Node> parent = new HashMap<>();
         parent = initMap(graph,parent,startNode, forbiddenNodes);
@@ -36,6 +43,14 @@ public class SearchAlgorithm  {
         return parent;
     }
 
+    /**
+     * A* algorithme
+     * @param graph  Topology
+     * @param startNode Node de départ
+     * @param destination Node d'arrivée
+     * @param forbiddenNodes Liste des noeuds interdits
+     * @return HashMap<Node,Node> parent
+     */
     public HashMap<Node,Node> AStar(Topology graph, Node startNode,  HashSet<Node> forbiddenNodes) {
         HashMap<Node,Node> parent = new HashMap<>();
         parent = initMap(graph,parent,startNode, forbiddenNodes);
@@ -58,6 +73,14 @@ public class SearchAlgorithm  {
         return parent;
     }
 
+    /**
+     * Initialisation de la HashMap
+     * @param graph  Topology
+     * @param parent HashMap<Node,Node>
+     * @param startNode Node de départ
+     * @param forbiddenNodes Liste des noeuds interdits
+     * @return HashMap<Node,Node> parent
+     */
     private HashMap<Node,Node> initMap(Topology graph,HashMap<Node,Node> parent,Node startNode, HashSet<Node> forbiddenNodes){
         for (Node n : graph.getNodes()) {
             if(!forbiddenNodes.contains(n)){

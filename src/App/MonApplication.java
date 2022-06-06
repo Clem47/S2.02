@@ -1,4 +1,3 @@
-package App;
 import io.jbotsim.core.Color;
 import io.jbotsim.core.Node;
 import io.jbotsim.core.Topology;
@@ -63,7 +62,10 @@ public class MonApplication implements ActionListener , SelectionListener {
         window.pack();
         window.setVisible(true);
     }
-
+    /**
+     * Gére les evenements
+     * @param e evenement
+     */
     @Override
     public void actionPerformed(ActionEvent e) {
         SearchAlgorithm algo = new SearchAlgorithm(source,destination);
@@ -138,6 +140,10 @@ public class MonApplication implements ActionListener , SelectionListener {
         }
     }
 
+    /**
+     * Gere les evenements de selection
+     * @param node node selectionné
+     */
     @Override
     public void onSelection(Node selectedNode) {
         if(source == null){
@@ -154,8 +160,13 @@ public class MonApplication implements ActionListener , SelectionListener {
             forbiddenNodes.add(selectedNode);
             selectedNode.setColor(Color.red);
         }
-    }
+    } 
 
+    /**
+     * géneration d'une grille
+     * @param tp une topologie 
+     * @param nbRows taille de la grille
+     */
     public static void genererGrille(Topology tp, int nbRows){
         int stepX = (tp.getWidth() - 100) / (nbRows - 1);
         int stepY = (tp.getHeight() - 100) / (nbRows - 1);
@@ -172,6 +183,10 @@ public class MonApplication implements ActionListener , SelectionListener {
         }
     }
 
+    /**
+     * Récupaire le chemin entre la destination et la source
+     * @param parents un dictionnaire de parents
+     */
     public ArrayList<Node> extraireChemin(HashMap<Node,Node> graph){
         ArrayList<Node> goodPath = new ArrayList<>();
         goodPath.add(destination);
@@ -181,6 +196,9 @@ public class MonApplication implements ActionListener , SelectionListener {
         return goodPath;
     }
 
+    /**
+     * Réinitialise les noeuds interdits
+     */
     private void resetForbiddenNodes(){
         for (Node n : forbiddenNodes) {
             n.setColor(Node.DEFAULT_COLOR);
@@ -188,6 +206,9 @@ public class MonApplication implements ActionListener , SelectionListener {
         forbiddenNodes.clear();
     }
 
+    /**
+     * Réinitialise les liens
+     */
     private void resetPath(){
         for (Link l : tp.getLinks()) {
             l.setWidth(1);
